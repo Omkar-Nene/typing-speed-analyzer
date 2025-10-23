@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Typing Speed Game</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
+        <div class="wrapper w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
+            <!-- Header -->
+            <div class="mb-6 text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Typing Speed Test</h1>
+                <p class="text-gray-600 mb-4">Test your typing speed and accuracy</p>
+                <!-- User info and Leaderboard button -->
+                <div class="flex items-center justify-center gap-3 flex-wrap">
+                    <!-- User Profile Display -->
+                    <div class="flex items-center gap-3 bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-3 rounded-xl border-2 border-indigo-200 shadow-sm">
+                        <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                            U
+                        </div>
+                        <div class="flex flex-col items-start">
+                            <span id="user-display" class="text-base text-gray-800 font-semibold"></span>
+                            <button id="change-user-btn" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium hover:underline flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                                Switch User
+                            </button>
+                        </div>
+                    </div>
+                    <button id="leaderboard-btn" class="px-5 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold rounded-xl shadow-md hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-200">
+                        🏆 Leaderboard
+                    </button>
+                </div>
+            </div>
+
+            <input type="text" class="input-field absolute opacity-0 -z-10"/>
+
+            <div class="content-box bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-colors duration-300">
+                <!-- Typing Text Area -->
+                <div class="typing-text mb-6 p-6 bg-white rounded-lg shadow-inner min-h-[120px] flex items-center">
+                    <p class="text-2xl leading-relaxed text-gray-700 font-mono"></p>
+                </div>
+
+                <div class="content">
+                    <!-- Stats Grid -->
+                    <ul class="result-details grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <li class="time bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 shadow-md transform hover:scale-105 transition-transform duration-200">
+                            <p class="text-sm font-medium opacity-90 mb-1">Time Left</p>
+                            <span class="text-3xl font-bold"><b>60</b>s</span>
+                        </li>
+                        <li class="mistakes bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg p-4 shadow-md transform hover:scale-105 transition-transform duration-200">
+                            <p class="text-sm font-medium opacity-90 mb-1">Mistakes</p>
+                            <span class="text-3xl font-bold">0</span>
+                        </li>
+                        <li class="wpm bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4 shadow-md transform hover:scale-105 transition-transform duration-200">
+                            <p class="text-sm font-medium opacity-90 mb-1">WPM</p>
+                            <span class="text-3xl font-bold">0</span>
+                        </li>
+                        <li class="cpm bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4 shadow-md transform hover:scale-105 transition-transform duration-200">
+                            <p class="text-sm font-medium opacity-90 mb-1">CPM</p>
+                            <span class="text-3xl font-bold">0</span>
+                        </li>
+                    </ul>
+
+                    <!-- Try Again Button -->
+                    <button class="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 active:scale-95 transition-all duration-200">
+                        Try Again
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="mt-6 text-center text-gray-600 text-sm">
+                <p>Click on the text area and start typing to begin the test</p>
+            </div>
+        </div>
+
+        <!-- Username Input Modal -->
+        <div id="username-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Welcome!</h2>
+                <p class="text-gray-600 mb-6 text-center">Enter your name to get started</p>
+                <input
+                    type="text"
+                    id="username-input"
+                    placeholder="Your name"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-lg mb-4"
+                    maxlength="20"
+                />
+                <button id="username-submit" class="w-full px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 active:scale-95 transition-all duration-200">
+                    Start Typing!
+                </button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Modal -->
+        <div id="leaderboard-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">🏆 Leaderboard</h2>
+                    <button id="close-leaderboard" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-4 mb-6 border-b-2 border-gray-200">
+                    <button id="global-tab" class="tab-btn px-6 py-2 font-semibold text-indigo-600 border-b-2 border-indigo-600">
+                        Global
+                    </button>
+                    <button id="personal-tab" class="tab-btn px-6 py-2 font-semibold text-gray-500 hover:text-indigo-600">
+                        My History
+                    </button>
+                </div>
+
+                <!-- Score Info -->
+                <div class="flex items-center gap-2 mb-4 bg-blue-50 p-3 rounded-lg">
+                    <span class="text-sm text-gray-700">Rankings based on composite score (0-10)</span>
+                    <button id="score-info-btn" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm underline">
+                        How is it calculated?
+                    </button>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Rank</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Score</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">WPM</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Accuracy</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Mistakes</th>
+                                <th class="px-4 py-3 text-right text-sm font-semibold text-gray-700">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body" class="divide-y divide-gray-200">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Personal Stats (shown in My History tab) -->
+                <div id="personal-stats" class="mt-6 hidden">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600 mb-1">Best WPM</p>
+                            <p id="best-wpm" class="text-2xl font-bold text-blue-600">--</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600 mb-1">Avg WPM</p>
+                            <p id="avg-wpm" class="text-2xl font-bold text-green-600">--</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg text-center">
+                            <p class="text-sm text-gray-600 mb-1">Tests Taken</p>
+                            <p id="total-tests" class="text-2xl font-bold text-purple-600">--</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Calculation Modal -->
+        <div id="score-info-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Score Calculation</h2>
+                    <button id="close-score-info" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-gray-700">Your composite score is calculated out of <strong>10 points</strong> using industry-standard weights:</p>
+
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+                        <h3 class="font-bold text-blue-800 mb-2">🚀 Speed (50% weight) - Max 5 points</h3>
+                        <p class="text-sm text-gray-700">Based on Words Per Minute (WPM)</p>
+                        <p class="text-xs text-gray-600 mt-1">Formula: (WPM ÷ 100) × 5</p>
+                        <p class="text-xs text-gray-600">Example: 80 WPM = 4.0 points</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+                        <h3 class="font-bold text-green-800 mb-2">🎯 Accuracy (40% weight) - Max 4 points</h3>
+                        <p class="text-sm text-gray-700">Percentage of correctly typed characters</p>
+                        <p class="text-xs text-gray-600 mt-1">Formula: (Accuracy ÷ 100) × 4</p>
+                        <p class="text-xs text-gray-600">Example: 95% accuracy = 3.8 points</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+                        <h3 class="font-bold text-purple-800 mb-2">✨ Consistency (10% weight) - Max 1 point</h3>
+                        <p class="text-sm text-gray-700">Based on low mistake count</p>
+                        <p class="text-xs text-gray-600 mt-1">Formula: max(1 - (Mistakes ÷ 20), 0)</p>
+                        <p class="text-xs text-gray-600">Example: 5 mistakes = 0.75 points</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border-2 border-yellow-300">
+                        <h3 class="font-bold text-yellow-800 mb-2">📊 Example Calculation</h3>
+                        <p class="text-sm text-gray-700">80 WPM + 95% Accuracy + 5 Mistakes</p>
+                        <p class="text-sm text-gray-700 mt-1">= 4.0 + 3.8 + 0.75 = <strong class="text-lg">8.55/10</strong></p>
+                    </div>
+                </div>
+
+                <button id="close-score-info-btn" class="w-full mt-6 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 active:scale-95 transition-all duration-200">
+                    Got it!
+                </button>
+            </div>
+        </div>
+
+        <script src="js/supabase-config.js"></script>
+        <script src="js/script.js"></script>
+    </body>
+</html>

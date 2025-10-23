@@ -1,0 +1,64 @@
+/* Custom styles for typing indicators */
+.typing-text {
+    overflow: hidden;
+}
+
+.typing-text p {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    line-height: 2;
+    white-space: normal;
+    max-width: 100%;
+    display: block;
+}
+
+.typing-text p span {
+    position: relative;
+    display: inline-block;
+    white-space: pre;
+}
+
+.typing-text p span.space {
+    display: inline-block;
+    width: 0.5ch;
+}
+
+.typing-text p span.active {
+    color: #3b82f6;
+}
+
+.typing-text p span.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background: #3b82f6;
+    animation: blink 1s infinite;
+}
+
+.typing-text p span.correct {
+    color: #10b981;
+}
+
+.typing-text p span.incorrect {
+    color: #ef4444;
+    background: #fee2e2;
+    border-radius: 2px;
+}
+
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* Custom selection color */
+::selection {
+    color: white;
+    background-color: #8b5cf6;
+}
