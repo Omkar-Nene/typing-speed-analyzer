@@ -1,6 +1,8 @@
 // Supabase Configuration
-const SUPABASE_URL = 'https://meqisqhoguyzvezqdmbx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcWlzcWhvZ3V5enZlenFkbWJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjIwOTksImV4cCI6MjA3Njc5ODA5OX0.c-5dHxOeWDippUYlAvGpU0gLfBQab-Bt1kOACqD9n50';
+// Uses environment variables for security
+// Fallback values are provided for development only
+const SUPABASE_URL = window.APP_CONFIG?.supabase?.url || 'https://meqisqhoguyzvezqdmbx.supabase.co';
+const SUPABASE_ANON_KEY = window.APP_CONFIG?.supabase?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcWlzcWhvZ3V5enZlenFkbWJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjIwOTksImV4cCI6MjA3Njc5ODA5OX0.c-5dHxOeWDippUYlAvGpU0gLfBQab-Bt1kOACqD9n50';
 
 // Initialize Supabase client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
